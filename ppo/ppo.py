@@ -163,7 +163,9 @@ class PPO(OnPolicyAlgorithm):
                 if self.use_sde:
                     self.policy.reset_noise(self.batch_size)
 
-                values, log_prob, entropy = self.policy.evaluate_actions(rollout_data.observations, actions)
+                action_mask = self.env.get_attr("valid_actions")[0]
+                assert len(self.env.get_attr("valid_actions")) == 1
+                values, log_prob, entropy = self.policy.evaluate_actions(rollout_data.observations, actions, action_mask=action_mask)
                 values = values.flatten()
                 # Normalize advantage
                 advantages = rollout_data.advantages

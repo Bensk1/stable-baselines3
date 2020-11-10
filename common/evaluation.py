@@ -48,7 +48,9 @@ def evaluate_policy(
         episode_reward = 0.0
         episode_length = 0
         while not done:
-            action, state = model.predict(obs, state=state, deterministic=deterministic)
+            assert len(env.get_attr("valid_actions")) == 1
+            action_mask = env.get_attr("valid_actions")[0]
+            action, state = model.predict(obs, state=state, deterministic=deterministic, action_mask=action_mask)
             obs, reward, done, _info = env.step(action)
             episode_reward += reward
             if callback is not None:

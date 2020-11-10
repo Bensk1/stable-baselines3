@@ -271,7 +271,13 @@ class CategoricalDistribution(Distribution):
         action_logits = nn.Linear(latent_dim, self.action_dim)
         return action_logits
 
-    def proba_distribution(self, action_logits: th.Tensor) -> "CategoricalDistribution":
+    def proba_distribution(self, action_logits: th.Tensor, action_mask=None) -> "CategoricalDistribution":
+        assert action_mask is not None
+        mask = th.from_numpy(action_mask)
+
+        # Mask contains 0 where action is allowed and -np.inf for forbidden actions
+        action_logits = mask + action_logits
+
         self.distribution = Categorical(logits=action_logits)
         return self
 

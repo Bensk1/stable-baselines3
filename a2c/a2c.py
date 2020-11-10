@@ -125,7 +125,9 @@ class A2C(OnPolicyAlgorithm):
                 actions = actions.long().flatten()
 
             # TODO: avoid second computation of everything because of the gradient
-            values, log_prob, entropy = self.policy.evaluate_actions(rollout_data.observations, actions)
+            action_mask = self.env.get_attr("valid_actions")[0]
+            assert len(self.env.get_attr("valid_actions")) == 1
+            values, log_prob, entropy = self.policy.evaluate_actions(rollout_data.observations, actions, action_mask=action_mask)
             values = values.flatten()
 
             # Normalize advantage (not present in the original implementation)

@@ -151,7 +151,9 @@ class OnPolicyAlgorithm(BaseAlgorithm):
             with th.no_grad():
                 # Convert to pytorch tensor
                 obs_tensor = th.as_tensor(self._last_obs).to(self.device)
-                actions, values, log_probs = self.policy.forward(obs_tensor)
+                action_mask = self.env.get_attr("valid_actions")[0]
+                assert len(self.env.get_attr("valid_actions")) == 1
+                actions, values, log_probs = self.policy.forward(obs_tensor, action_mask=action_mask)
             actions = actions.cpu().numpy()
 
             # Rescale and perform action
@@ -181,8 +183,10 @@ class OnPolicyAlgorithm(BaseAlgorithm):
 
         with th.no_grad():
             # Compute value for the last timestep
+            action_mask = self.env.get_attr("valid_actions")[0]
+            assert len(self.env.get_attr("valid_actions")) == 1
             obs_tensor = th.as_tensor(new_obs).to(self.device)
-            _, values, _ = self.policy.forward(obs_tensor)
+            _, values, _ = self.policy.forward(obs_tensor, action_mask=action_mask)
 
         rollout_buffer.compute_returns_and_advantage(last_values=values, dones=dones)
 
