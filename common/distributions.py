@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import gym
+import numpy as np
 import torch as th
 from gym import spaces
 from torch import nn
@@ -272,9 +273,8 @@ class CategoricalDistribution(Distribution):
         return action_logits
 
     def proba_distribution(self, action_logits: th.Tensor, action_mask=None) -> "CategoricalDistribution":
-        assert action_mask is not None
-        mask = th.from_numpy(action_mask)
-
+        # if action_mask is not None:
+        mask = th.from_numpy(np.array(action_mask))
         # Mask contains 0 where action is allowed and -np.inf for forbidden actions
         action_logits = mask + action_logits
 
